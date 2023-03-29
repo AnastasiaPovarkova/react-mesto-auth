@@ -28,8 +28,9 @@ function Login({ handleLogin, handleNotification }) {
     setIsAuthLoading(true);
     auth
       .authorize(formValue.password, formValue.email)
-      .then((data) => {
-        if (data.token) {
+      .then((res) => {
+        if (res.token) {
+          console.log(res);
           handleLogin();
           setFormValue({ password: "", email: "" });
           navigate("/", { replace: true });

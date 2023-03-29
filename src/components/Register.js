@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as auth from "../auth.js";
 
-function Register({ handleNotification }) {
+function Register({ handleNotification, handleErrorMessageNotification }) {
   const [formValue, setFormValue] = useState({
     password: "",
     email: "",
@@ -27,10 +27,12 @@ function Register({ handleNotification }) {
     auth
       .register(formValue.email, formValue.password)
       .then((res) => {
-        if (!res.error) {
+        if (!(res.message || res.error)) {
+          console.log(res);
           handleNotification(true);
           navigate("/signin", { replace: true });
         } else {
+          handleErrorMessageNotification(res.message || res.error);
           handleNotification(false);
         }
       })

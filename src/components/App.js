@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from "react-router-dom";
 import Header from "./Header";
 import Main from "./Main";
 import ImagePopup from "./ImagePopup";
@@ -15,9 +15,9 @@ import PageNotFound from "./PageNotFound";
 
 import api from "../utils/api";
 import { UserContext } from "../contexts/CurrentUserContext";
-import {Navigate, useNavigate} from 'react-router-dom';
+import { Navigate, useNavigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import * as auth from '../auth.js';
+import * as auth from "../auth.js";
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
@@ -32,12 +32,18 @@ function App() {
   const [cards, setCards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
+  const [userEmail, setUserEmail] = useState("");
   const [isSuccess, setIsSuccess] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
-  const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isDeleteCardPopupOpen || selectedCard.link
+  const isOpen =
+    isEditAvatarPopupOpen ||
+    isEditProfilePopupOpen ||
+    isAddPlacePopupOpen ||
+    isDeleteCardPopupOpen ||
+    selectedCard.link;
 
   useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
@@ -56,58 +62,69 @@ function App() {
     setIsSuccessPopupOpen(false);
     setSelectedCard({});
     setSelectedForDeleteCard({});
+    setErrorMessage("");
   }
 
   useEffect(() => {
     function closeByEscape(evt) {
-      if(evt.key === 'Escape') {
+      if (evt.key === "Escape") {
         closeAllPopups();
       }
     }
-    if(isOpen) { // навешиваем только при открытии
-      document.addEventListener('keydown', closeByEscape);
+    if (isOpen) {
+      // навешиваем только при открытии
+      document.addEventListener("keydown", closeByEscape);
       return () => {
-        document.removeEventListener('keydown', closeByEscape);
-      }
+        document.removeEventListener("keydown", closeByEscape);
+      };
     }
-  }, [isOpen]) 
+  }, [isOpen]);
 
   useEffect(() => {
     handleTokenCheck();
-  }, [])
+  }, []);
 
-  const handleTokenCheck = () => {  //Проверка наличия токена в localStorage
-    if (localStorage.getItem('jwt')){
-      const jwt = localStorage.getItem('jwt');
-      auth.checkToken(jwt).then((res) => {
-        console.log(res);
-        if (res){
-          setLoggedIn(true);
-          setUserEmail(res.data.email);
-          navigate("/", {replace: true})
-        }
-      })
-      .catch((err) => console.log(err));
+  const handleTokenCheck = () => {
+    //Проверка наличия токена в localStorage
+    if (localStorage.getItem("jwt")) {
+      const jwt = localStorage.getItem("jwt");
+      auth
+        .checkToken(jwt)
+        .then((res) => {
+          console.log(res);
+          if (res) {
+            setLoggedIn(true);
+            setUserEmail(res.data.email);
+            navigate("/", { replace: true });
+          }
+        })
+        .catch((err) => console.log(err));
     }
-  }
+  };
 
   function handleLogin() {
     setLoggedIn(true);
-    auth.checkToken(localStorage.getItem('jwt')).then((res) => {
-      if (res){
-        setUserEmail(res.data.email);
-      }
-    })
-    .catch((err) => console.log(err));
+    auth
+      .checkToken(localStorage.getItem("jwt"))
+      .then((res) => {
+        if (res) {
+          setUserEmail(res.data.email);
+        }
+      })
+      .catch((err) => console.log(err));
   }
 
   function handleEmailReset() {
-    setUserEmail('');
+    setUserEmail("");
   }
 
   function handleNotification(successed) {
     setIsSuccessPopupOpen(true);
     setIsSuccess(successed);
+  }
+
+  function handleErrorMessageNotification(err) {
+    setErrorMessage(err);
   }
 
   function handleCardLike(card) {
@@ -190,24 +207,55 @@ function App() {
   return (
     <UserContext.Provider value={currentUser}>
       <div className="page">
-        <Header email={userEmail} handleEmailReset={handleEmailReset}/>
+        <Header email={userEmail} handleEmailReset={handleEmailReset} />
         <Routes>
-          <Route path="/" element={loggedIn ? <Navigate to="/mesto-react" replace /> : <Navigate to="/signin" replace />} />
-          <Route path="/mesto-react" element={<ProtectedRoute element={Main}
-          cards={cards}
-          onEditAvatar={() => setIsEditAvatarPopupOpen(true)}
-          onEditProfile={() => setIsEditProfilePopupOpen(true)}
-          onAddPlace={() => setIsAddPlacePopupOpen(true)}
-          handleCardClick={() => setSelectedCard}
-          handleDeleteClick={() => handleDeletePopupOpen}
-          handleCardLike={() => handleCardLike}
-          loggedIn={loggedIn}
-        />} />
-          <Route path="/signup" element={<Register handleNotification={handleNotification} />} />
-          <Route path="/signin" element={<Login handleLogin={handleLogin} handleNotification={handleNotification}/>} />
+          <Route
+            path="/"
+            element={
+              loggedIn ? (
+                <Navigate to="/mesto-react" replace />
+              ) : (
+                <Navigate to="/signin" replace />
+              )
+            }
+          />
+          <Route
+            path="/mesto-react"
+            element={
+              <ProtectedRoute
+                element={Main}
+                cards={cards}
+                onEditAvatar={() => setIsEditAvatarPopupOpen(true)}
+                onEditProfile={() => setIsEditProfilePopupOpen(true)}
+                onAddPlace={() => setIsAddPlacePopupOpen(true)}
+                handleCardClick={() => setSelectedCard}
+                handleDeleteClick={() => handleDeletePopupOpen}
+                handleCardLike={() => handleCardLike}
+                loggedIn={loggedIn}
+              />
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <Register
+                handleNotification={handleNotification}
+                handleErrorMessageNotification={handleErrorMessageNotification}
+              />
+            }
+          />
+          <Route
+            path="/signin"
+            element={
+              <Login
+                handleLogin={handleLogin}
+                handleNotification={handleNotification}
+              />
+            }
+          />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
-        
+
         <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
@@ -234,10 +282,11 @@ function App() {
           isLoading={isLoading}
         />
         <ImagePopup card={selectedCard} onClose={closeAllPopups} />
-        <InfoTooltip 
-          isOpen={isSuccessPopupOpen} 
+        <InfoTooltip
+          isOpen={isSuccessPopupOpen}
           onClose={closeAllPopups}
-          isSuccess={isSuccess} 
+          isSuccess={isSuccess}
+          errorMessage={errorMessage}
         />
         <Footer />
       </div>

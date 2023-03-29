@@ -25,11 +25,11 @@ export const authorize = (password, email) => {
     body: JSON.stringify({ password, email }),
   })
     .then((response) => response.json())
-    .then((data) => {
-      if (data.token) {
-        localStorage.setItem("jwt", data.token);
-        return data;
+    .then((res) => {
+      if (res.token) {
+        localStorage.setItem("jwt", res.token);
       }
+      return res;
     });
 };
 
