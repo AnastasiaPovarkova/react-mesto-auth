@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "../images/logo__image.svg";
-import { BrowserRouter, Link, Routes, Route } from 'react-router-dom';
+import { Link, Routes, Route } from 'react-router-dom';
 
 function Header({email, handleEmailReset}) {
 
