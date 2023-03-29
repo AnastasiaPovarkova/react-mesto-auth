@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Routes, Route } from 'react-router-dom';
 import Header from "./Header";
 import Main from "./Main";
 import ImagePopup from "./ImagePopup";
@@ -7,21 +8,34 @@ import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 import DeleteCardPopup from "./DeleteCardPopup";
 import Footer from "./Footer";
+import Login from "./Login";
+import Register from "./Register";
+import InfoTooltip from "./InfoTooltip";
+import PageNotFound from "./PageNotFound";
 
 import api from "../utils/api";
 import { UserContext } from "../contexts/CurrentUserContext";
+import {Navigate, useNavigate} from 'react-router-dom';
+import ProtectedRoute from "./ProtectedRoute";
+import * as auth from '../auth.js';
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isDeleteCardPopupOpen, setIsDeleteCardPopupOpen] = useState(false);
+  const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [selectedForDeleteCard, setSelectedForDeleteCard] = useState({});
 
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [isSuccess, setIsSuccess] = useState(true);
+
+  const navigate = useNavigate();
 
   const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isDeleteCardPopupOpen || selectedCard.link
 
@@ -39,6 +53,7 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsDeleteCardPopupOpen(false);
+    setIsSuccessPopupOpen(false);
     setSelectedCard({});
     setSelectedForDeleteCard({});
   }
@@ -56,6 +71,44 @@ function App() {
       }
     }
   }, [isOpen]) 
+
+  useEffect(() => {
+    handleTokenCheck();
+  }, [])
+
+  const handleTokenCheck = () => {  //Проверка наличия токена в localStorage
+    if (localStorage.getItem('jwt')){
+      const jwt = localStorage.getItem('jwt');
+      auth.checkToken(jwt).then((res) => {
+        console.log(res);
+        if (res){
+          setLoggedIn(true);
+          setUserEmail(res.data.email);
+          navigate("/", {replace: true})
+        }
+      })
+      .catch((err) => console.log(err));
+    }
+  }
+
+  function handleLogin() {
+    setLoggedIn(true);
+    auth.checkToken(localStorage.getItem('jwt')).then((res) => {
+      if (res){
+        setUserEmail(res.data.email);
+      }
+    })
+    .catch((err) => console.log(err));
+  }
+
+  function handleEmailReset() {
+    setUserEmail('');
+  }
+
+  function handleNotification(successed) {
+    setIsSuccessPopupOpen(true);
+    setIsSuccess(successed);
+  }
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id); //поставлен ли лайк
@@ -137,8 +190,10 @@ function App() {
   return (
     <UserContext.Provider value={currentUser}>
       <div className="page">
-        <Header />
-        <Main
+        <Header email={userEmail} handleEmailReset={handleEmailReset}/>
+        <Routes>
+          <Route path="/" element={loggedIn ? <Navigate to="/mesto-react" replace /> : <Navigate to="/signin" replace />} />
+          <Route path="/mesto-react" element={<ProtectedRoute element={Main}
           cards={cards}
           onEditAvatar={() => setIsEditAvatarPopupOpen(true)}
           onEditProfile={() => setIsEditProfilePopupOpen(true)}
@@ -146,7 +201,13 @@ function App() {
           handleCardClick={() => setSelectedCard}
           handleDeleteClick={() => handleDeletePopupOpen}
           handleCardLike={() => handleCardLike}
-        />
+          loggedIn={loggedIn}
+        />} />
+          <Route path="/signup" element={<Register handleNotification={handleNotification} />} />
+          <Route path="/signin" element={<Login handleLogin={handleLogin} handleNotification={handleNotification}/>} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+        
         <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
@@ -173,6 +234,11 @@ function App() {
           isLoading={isLoading}
         />
         <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+        <InfoTooltip 
+          isOpen={isSuccessPopupOpen} 
+          onClose={closeAllPopups}
+          isSuccess={isSuccess} 
+        />
         <Footer />
       </div>
     </UserContext.Provider>
