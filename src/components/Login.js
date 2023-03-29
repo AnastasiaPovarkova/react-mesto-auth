@@ -26,7 +26,6 @@ function Login({ handleLogin, handleNotification }) {
     auth
       .authorize(formValue.password, formValue.email)
       .then((data) => {
-        console.log(data);
         if (data.token) {
           handleLogin();
           setFormValue({ password: "", email: "" });
