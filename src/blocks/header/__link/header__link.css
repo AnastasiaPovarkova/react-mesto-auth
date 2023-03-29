@@ -7,3 +7,9 @@
   color: #A9A9A9;
   text-decoration: none;
 }
+
+@media screen and (max-width: 600px) {
+  .header__link{
+    margin-right: 27px;
+  }
+}
