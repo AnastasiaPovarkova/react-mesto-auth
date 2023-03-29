@@ -8,6 +8,8 @@ function Register({ handleNotification }) {
     email: "",
   });
 
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+
   const navigate = useNavigate();
 
   function handleChange(e) {
@@ -21,6 +23,7 @@ function Register({ handleNotification }) {
   function handleSubmit(e) {
     e.preventDefault();
     console.log(formValue);
+    setIsAuthLoading(true);
     auth
       .register(formValue.email, formValue.password)
       .then((res) => {
@@ -31,7 +34,8 @@ function Register({ handleNotification }) {
           handleNotification(false);
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsAuthLoading(false));
   }
 
   return (
@@ -76,8 +80,7 @@ function Register({ handleNotification }) {
           defaultValue="Зарегистрироваться"
           onSubmit={handleSubmit}
         >
-          {"Зарегистрироваться"}
-          {/* {isLoading ? "Регистрация..." : "Зарегистрироваться"} */}
+          {isAuthLoading ? "Регистрация..." : "Зарегистрироваться"}
         </button>
       </form>
       <div className="login__enter">

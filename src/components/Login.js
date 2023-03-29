@@ -10,6 +10,8 @@ function Login({ handleLogin, handleNotification }) {
 
   const navigate = useNavigate();
 
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -23,6 +25,7 @@ function Login({ handleLogin, handleNotification }) {
     if (!formValue.password || !formValue.email) {
       return;
     }
+    setIsAuthLoading(true);
     auth
       .authorize(formValue.password, formValue.email)
       .then((data) => {
@@ -32,7 +35,8 @@ function Login({ handleLogin, handleNotification }) {
           navigate("/", { replace: true });
         }
       })
-      .catch((err) => handleNotification(false));
+      .catch((err) => handleNotification(false))
+      .finally(() => setIsAuthLoading(false));
   };
 
   return (
@@ -77,7 +81,7 @@ function Login({ handleLogin, handleNotification }) {
           defaultValue="Войти"
           onSubmit={handleSubmit}
         >
-          {"Войти"}
+          {isAuthLoading ? "Вход..." : "Войти"}
         </button>
       </form>
     </div>
