@@ -17,7 +17,7 @@ import api from "../utils/api";
 import { UserContext } from "../contexts/CurrentUserContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import * as auth from "../auth.js";
+import * as auth from "../utils/auth.js";
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);

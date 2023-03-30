@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as auth from "../auth.js";
+import * as auth from "../utils/auth.js";
 
 function Login({ handleLogin, handleNotification }) {
   const [formValue, setFormValue] = useState({
