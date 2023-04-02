@@ -57,9 +57,9 @@ function Main({
             <Card
               key={card._id}
               card={card}
-              onCardClick={handleCardClick()}
-              onDeleteClick={handleDeleteClick()}
-              onCardLike={handleCardLike()}
+              onCardClick={handleCardClick}
+              onDeleteClick={handleDeleteClick}
+              onCardLike={handleCardLike}
             />
           );
         })}

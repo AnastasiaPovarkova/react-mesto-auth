@@ -1,43 +1,13 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import * as auth from "../utils/auth.js";
+import useForm from "../hooks/useForm";
+import { Link } from "react-router-dom";
 
-function Register({ handleNotification, handleErrorMessageNotification }) {
-  const [formValue, setFormValue] = useState({
-    password: "",
-    email: "",
-  });
-
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
-
-  const navigate = useNavigate();
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setFormValue({
-      ...formValue,
-      [name]: value,
-    });
-  }
+function Register({ handleRegister, isAuthLoading }) {
+  const {formValue, error, handleChange, resetValidation} = useForm();
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log(formValue);
-    setIsAuthLoading(true);
-    auth
-      .register(formValue.email, formValue.password)
-      .then((res) => {
-        if (!(res.message || res.error)) {
-          console.log(res);
-          handleNotification(true);
-          navigate("/signin", { replace: true });
-        } else {
-          handleErrorMessageNotification(res.message || res.error);
-          handleNotification(false);
-        }
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setIsAuthLoading(false));
+    handleRegister(formValue);
+    resetValidation();
   }
 
   return (
@@ -45,15 +15,14 @@ function Register({ handleNotification, handleErrorMessageNotification }) {
       <form
         name="form__login"
         className="popup__content"
-        noValidate
         onSubmit={handleSubmit}
       >
         <h2 className="login__title">Регистрация</h2>
         <input
-          type="text"
+          type="email"
           id="email-field"
           className="login__field"
-          value={formValue.email}
+          value={formValue.email || ''}
           onChange={handleChange}
           minLength="2"
           maxLength="50"
@@ -61,12 +30,12 @@ function Register({ handleNotification, handleErrorMessageNotification }) {
           placeholder="Email"
           name="email"
         />
-        <span className="name-field-error login__span"></span>
+        <span className="name-field-error login__span">{error.email || ''}</span>
         <input
           type="text"
           id="password-field"
           className="login__field"
-          value={formValue.password}
+          value={formValue.password || ''}
           onChange={handleChange}
           minLength="2"
           maxLength="40"
@@ -74,13 +43,12 @@ function Register({ handleNotification, handleErrorMessageNotification }) {
           placeholder="Пароль"
           name="password"
         />
-        <span className="profession-field-error login__span"></span>
+        <span className="profession-field-error login__span">{error.password || ''}</span>
         <button
           type="submit"
           className="login__submit"
           name="submit"
           defaultValue="Зарегистрироваться"
-          onSubmit={handleSubmit}
         >
           {isAuthLoading ? "Регистрация..." : "Зарегистрироваться"}
         </button>

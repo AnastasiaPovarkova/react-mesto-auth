@@ -31,7 +31,9 @@ function InfoTooltip({ isOpen, onClose, isSuccess, errorMessage }) {
               ? "Вы успешно зарегистрировались!"
               : "Что-то пошло не так! Попробуйте ещё раз."}
           </h2>
-          <h2 className="info__error">{errorMessage}</h2>
+          <h2 className="info__error">
+            {errorMessage}
+          </h2>
         </div>
       </div>
     </div>

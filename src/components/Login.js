@@ -1,43 +1,16 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import * as auth from "../utils/auth.js";
+import useForm from "../hooks/useForm";
 
-function Login({ handleLogin, handleNotification }) {
-  const [formValue, setFormValue] = useState({
-    password: "",
-    email: "",
-  });
+function Login({ handleLogin, isAuthLoading }) {
+  const {formValue, error, handleChange, resetValidation, formValid} = useForm();
+  console.log(formValid);
 
-  const navigate = useNavigate();
-
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormValue({
-      ...formValue,
-      [name]: value,
-    });
-  };
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
     if (!formValue.password || !formValue.email) {
       return;
     }
-    setIsAuthLoading(true);
-    auth
-      .authorize(formValue.password, formValue.email)
-      .then((res) => {
-        if (res.token) {
-          console.log(res);
-          handleLogin();
-          setFormValue({ password: "", email: "" });
-          navigate("/", { replace: true });
-        }
-      })
-      .catch((err) => handleNotification(false))
-      .finally(() => setIsAuthLoading(false));
+    handleLogin(formValue);
+    resetValidation();
   };
 
   return (
@@ -45,15 +18,15 @@ function Login({ handleLogin, handleNotification }) {
       <form
         name="form__login"
         className="popup__content"
-        noValidate
         onSubmit={handleSubmit}
+        noValidate
       >
         <h2 className="login__title">Вход</h2>
         <input
-          type="text"
+          type="email"
           id="email-field"
           className="login__field"
-          value={formValue.email}
+          value={formValue.email || ''}
           onChange={handleChange}
           minLength="2"
           maxLength="50"
@@ -61,12 +34,12 @@ function Login({ handleLogin, handleNotification }) {
           placeholder="Email"
           name="email"
         />
-        <span className="name-field-error login__span"></span>
+        <span className="name-field-error login__span">{error.email || ''}</span>
         <input
           type="text"
           id="password-field"
           className="login__field"
-          value={formValue.password}
+          value={formValue.password || ''}
           onChange={handleChange}
           minLength="2"
           maxLength="40"
@@ -74,13 +47,12 @@ function Login({ handleLogin, handleNotification }) {
           placeholder="Пароль"
           name="password"
         />
-        <span className="profession-field-error login__span"></span>
+        <span className="profession-field-error login__span">{error.password || ''}</span>
         <button
           type="submit"
           className="login__submit"
           name="submit"
           defaultValue="Войти"
-          onSubmit={handleSubmit}
         >
           {isAuthLoading ? "Вход..." : "Войти"}
         </button>

@@ -1,31 +1,21 @@
-import React from "react";
+import { useEffect, useContext} from "react";
 import PopupWithForm from "./PopupWithForm";
 import { UserContext } from "../contexts/CurrentUserContext";
+import useForm from "../hooks/useForm";
 
 function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
-  const [name, setName] = React.useState("");
-  const [description, setDescription] = React.useState("");
+  const {formValue, error, handleChange, resetValidation} = useForm();
+  const currentUser = useContext(UserContext);
 
-  const currentUser = React.useContext(UserContext);
-
-  function handleNameChange(e) {
-    setName(e.target.value);
-  }
-  function handleDescriptionChange(e) {
-    setDescription(e.target.value);
-  }
-
-  React.useEffect(() => {
-    setName(currentUser.name);
-    setDescription(currentUser.about);
+  useEffect(() => {
+    resetValidation({ name: currentUser.name, about: currentUser.about}, {})
   }, [currentUser, isOpen]);
 
   function handleSubmit(e) {
-    e.preventDefault(); // Запрещаем браузеру переходить по адресу формы
-
+    e.preventDefault();
     onUpdateUser({
-      name,
-      about: description,
+      name: formValue.name,
+      about: formValue.about
     });
   }
 
@@ -43,28 +33,28 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
         type="text"
         id="name-field"
         className="popup__field popup__field_input_name"
-        value={name || ""}
-        onChange={handleNameChange}
+        value={formValue.name || ''}
+        onChange={handleChange}
         minLength="2"
         maxLength="40"
         required
         placeholder="Ваше имя"
         name="name"
       />
-      <span className="name-field-error popup__field-error"></span>
+      <span className="name-field-error popup__field-error">{error.name || ''}</span>
       <input
         type="text"
         id="profession-field"
         className="popup__field popup__field_input_profession"
-        value={description || ""}
-        onChange={handleDescriptionChange}
+        value={formValue.about || ''}
+        onChange={handleChange}
         minLength="2"
         maxLength="200"
         required
         placeholder="Ваша профессия"
         name="about"
       />
-      <span className="profession-field-error popup__field-error"></span>
+      <span className="profession-field-error popup__field-error">{error.about || ''}</span>
     </PopupWithForm>
   );
 }

@@ -17,7 +17,7 @@ import api from "../utils/api";
 import { UserContext } from "../contexts/CurrentUserContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import * as auth from "../utils/auth.js";
+import auth from "../utils/auth.js";
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
@@ -35,6 +35,7 @@ function App() {
   const [userEmail, setUserEmail] = useState("");
   const [isSuccess, setIsSuccess] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -87,9 +88,8 @@ function App() {
   const handleTokenCheck = () => {
     //Проверка наличия токена в localStorage
     if (localStorage.getItem("jwt")) {
-      const jwt = localStorage.getItem("jwt");
       auth
-        .checkToken(jwt)
+        .checkToken(localStorage.getItem("jwt"))
         .then((res) => {
           console.log(res);
           if (res) {
@@ -102,16 +102,46 @@ function App() {
     }
   };
 
-  function handleLogin() {
-    setLoggedIn(true);
+  function handleRegister(formValue) {
+    setIsAuthLoading(true);
     auth
-      .checkToken(localStorage.getItem("jwt"))
+      .register(formValue.email, formValue.password)
       .then((res) => {
         if (res) {
-          setUserEmail(res.data.email);
+          handleNotification(true);
+          navigate("/signin", { replace: true });
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        handleNotification(false);
+        console.log(err);
+        handleErrorMessageNotification(err);
+      })
+      .finally(() => setIsAuthLoading(false));
+  }
+
+  function handleLogin(formValue) {
+    setIsAuthLoading(true);
+    Promise.all([
+      auth.checkToken(localStorage.getItem("jwt")),
+      auth.authorize(formValue.password, formValue.email)
+    ])
+      .then(([data, res]) => {
+        if (data) {
+          setUserEmail(data.data.email);
+        }
+        if (res.token) {
+          console.log(res);
+          setLoggedIn(true);
+          navigate("/", { replace: true });
+        }
+      })
+      .catch((err) => {
+        handleNotification(false);
+        console.log(err);
+        handleErrorMessageNotification(err);
+      })
+      .finally(() => setIsAuthLoading(false));
   }
 
   function handleEmailReset() {
@@ -228,9 +258,9 @@ function App() {
                 onEditAvatar={() => setIsEditAvatarPopupOpen(true)}
                 onEditProfile={() => setIsEditProfilePopupOpen(true)}
                 onAddPlace={() => setIsAddPlacePopupOpen(true)}
-                handleCardClick={() => setSelectedCard}
-                handleDeleteClick={() => handleDeletePopupOpen}
-                handleCardLike={() => handleCardLike}
+                handleCardClick={setSelectedCard}
+                handleDeleteClick={handleDeletePopupOpen}
+                handleCardLike={handleCardLike}
                 loggedIn={loggedIn}
               />
             }
@@ -239,18 +269,15 @@ function App() {
             path="/signup"
             element={
               <Register
-                handleNotification={handleNotification}
-                handleErrorMessageNotification={handleErrorMessageNotification}
+                handleRegister={handleRegister}
+                isAuthLoading={isAuthLoading}
               />
             }
           />
           <Route
             path="/signin"
             element={
-              <Login
-                handleLogin={handleLogin}
-                handleNotification={handleNotification}
-              />
+              <Login handleLogin={handleLogin} isAuthLoading={isAuthLoading} />
             }
           />
           <Route path="*" element={<PageNotFound />} />
