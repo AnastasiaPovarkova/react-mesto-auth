@@ -1,8 +1,7 @@
 import useForm from "../hooks/useForm";
 
 function Login({ handleLogin, isAuthLoading }) {
-  const {formValue, error, handleChange, resetValidation, formValid} = useForm();
-  console.log(formValid);
+  const {formValue, error, handleChange, resetValidation} = useForm();
 
   function handleSubmit(e) {
     e.preventDefault();
