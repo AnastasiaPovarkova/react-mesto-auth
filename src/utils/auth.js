@@ -51,7 +51,7 @@ class Auth {
 }
 
 const auth = new Auth({
-  BASE_URL: "https://auth.nomoreparties.co",
+  BASE_URL: "http://api.mesto.anstpov.nomoredomains.monster", // "https://auth.nomoreparties.co"
 });
 
 export default auth;
