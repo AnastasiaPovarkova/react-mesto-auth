@@ -1,11 +1,12 @@
 class Auth {
   constructor(options) {
     this._baseUrl = options.BASE_URL;
+    this._headers = options.headers;
   }
 
   _getResponseData(res) {
     if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
+      return res.json().then(res => Promise.reject(res));
     }
     return res.json();
   }
@@ -17,9 +18,7 @@ class Auth {
   register = (email, password) => {
     return this._request(`${this._baseUrl}/signup`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       body: JSON.stringify({ password, email }),
     });
   };
@@ -27,9 +26,7 @@ class Auth {
   authorize = (password, email) => {
     return this._request(`${this._baseUrl}/signin`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       body: JSON.stringify({ password, email }),
     }).then((res) => {
       if (res.token) {
@@ -51,7 +48,10 @@ class Auth {
 }
 
 const auth = new Auth({
-  BASE_URL: "http://api.mesto.anstpov.nomoredomains.monster", // "https://auth.nomoreparties.co"
+  BASE_URL: "https://auth.nomoreparties.co", // "http://api.mesto.anstpov.nomoredomains.monster"
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 export default auth;

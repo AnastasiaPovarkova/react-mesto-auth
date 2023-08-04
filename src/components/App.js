@@ -53,7 +53,7 @@ function App() {
         setCards(cards);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [loggedIn]);
 
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
@@ -72,8 +72,7 @@ function App() {
         closeAllPopups();
       }
     }
-    if (isOpen) {
-      // навешиваем только при открытии
+    if (isOpen) { // навешиваем только при открытии
       document.addEventListener("keydown", closeByEscape);
       return () => {
         document.removeEventListener("keydown", closeByEscape);
@@ -86,12 +85,10 @@ function App() {
   }, []);
 
   const handleTokenCheck = () => {
-    //Проверка наличия токена в localStorage
-    if (localStorage.getItem("jwt")) {
+    if (localStorage.getItem("jwt")) { //Проверка наличия токена в localStorage
       auth
         .checkToken(localStorage.getItem("jwt"))
         .then((res) => {
-          console.log(res);
           if (res) {
             setLoggedIn(true);
             setUserEmail(res.data.email);
@@ -114,32 +111,24 @@ function App() {
       })
       .catch((err) => {
         handleNotification(false);
-        console.log(err);
-        handleErrorMessageNotification(err);
+        setErrorMessage(err.message || err.error);
       })
       .finally(() => setIsAuthLoading(false));
   }
 
   function handleLogin(formValue) {
     setIsAuthLoading(true);
-    Promise.all([
-      auth.checkToken(localStorage.getItem("jwt")),
       auth.authorize(formValue.password, formValue.email)
-    ])
-      .then(([data, res]) => {
-        if (data) {
-          setUserEmail(data.data.email);
-        }
+      .then((res) => {
         if (res.token) {
-          console.log(res);
           setLoggedIn(true);
+          handleTokenCheck();
           navigate("/", { replace: true });
         }
       })
       .catch((err) => {
         handleNotification(false);
-        console.log(err);
-        handleErrorMessageNotification(err);
+        setErrorMessage(err.message || err.error);
       })
       .finally(() => setIsAuthLoading(false));
   }
@@ -151,10 +140,6 @@ function App() {
   function handleNotification(successed) {
     setIsSuccessPopupOpen(true);
     setIsSuccess(successed);
-  }
-
-  function handleErrorMessageNotification(err) {
-    setErrorMessage(err);
   }
 
   function handleCardLike(card) {

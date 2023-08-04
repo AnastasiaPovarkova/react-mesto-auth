@@ -7,13 +7,22 @@
   height: 50px;
   border-radius: 2px;
   background-color: black;
-  color: #fff;
+  color: rgb(255, 255, 255);
   cursor: pointer;
   font-style: normal;
   font-weight: 400;
   font-size: 18px;
   line-height: 22px;
   transition: opacity 0.3s;
+}
+
+.popup__submit[disabled] {
+  background-color: grey;
+  cursor: default;
+}
+
+.popup__submit[disabled]:hover {
+  opacity: 1;
 }
 
 .popup__submit:hover {
