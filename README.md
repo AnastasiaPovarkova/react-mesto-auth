@@ -55,6 +55,4 @@ HashRouter, Routes, Route, Link, useNavigate, Navigate. Роут главной 
 
 Размещение проекта на сервере. В команде уже прописан predeploy: build.
 
-## GH Pages
-
-### [Ссылка на GitHub Pages](https://anastasiapovarkova.github.io/react-mesto-auth/)
+## Ссылка на GitHub Pages: [Mesto React with Auth](https://anastasiapovarkova.github.io/react-mesto-auth/)
