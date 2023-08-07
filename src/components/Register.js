@@ -2,7 +2,7 @@ import useForm from "../hooks/useForm";
 import { Link } from "react-router-dom";
 
 function Register({ handleRegister, isAuthLoading }) {
-  const {formValue, error, handleChange, resetValidation} = useForm();
+  const {formValue, error, handleChange, resetValidation, isValid} = useForm();
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -32,7 +32,7 @@ function Register({ handleRegister, isAuthLoading }) {
         />
         <span className="name-field-error login__span">{error.email || ''}</span>
         <input
-          type="text"
+          type="password"
           id="password-field"
           className="login__field"
           value={formValue.password || ''}
@@ -48,6 +48,7 @@ function Register({ handleRegister, isAuthLoading }) {
           type="submit"
           className="login__submit"
           name="submit"
+          disabled={!isValid}
           defaultValue="Зарегистрироваться"
         >
           {isAuthLoading ? "Регистрация..." : "Зарегистрироваться"}

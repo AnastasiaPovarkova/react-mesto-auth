@@ -3,7 +3,7 @@ import PopupWithForm from "./PopupWithForm";
 import useForm from "../hooks/useForm";
 
 function AddPlacePopup({ isOpen, onClose, onAddCard, isLoading }) {
-  const {formValue, error, handleChange, resetValidation} = useForm();
+  const {formValue, error, handleChange, resetValidation, isValid} = useForm();
 
   useEffect(() => {
     resetValidation()
@@ -12,8 +12,7 @@ function AddPlacePopup({ isOpen, onClose, onAddCard, isLoading }) {
   function handleSubmit(e) {
     e.preventDefault(); 
 
-    onAddCard({
-      // Передаём значения управляемых компонентов во внешний обработчик
+    onAddCard({ // Передаём значения управляемых компонентов во внешний обработчик
       name: formValue.cardName,
       link: formValue.link
     });
@@ -29,6 +28,7 @@ function AddPlacePopup({ isOpen, onClose, onAddCard, isLoading }) {
       isOpen={isOpen}
       onSubmit={handleSubmit}
       isLoading={isLoading}
+      isValid={isValid}
     >
       <input
         type="text"
