@@ -24,6 +24,10 @@
   opacity: 0.2;
 }
 
+.popup__submit[disabled]:hover {
+  opacity: 0.2;
+}
+
 .popup__submit:hover {
   opacity: 0.8;
 }
