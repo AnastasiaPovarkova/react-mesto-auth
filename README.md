@@ -1,4 +1,6 @@
-# Mesto-React-Auth - проект Mesto на Реакте с авторизацией и регистрацией
+# Проект Mesto на Реакте с авторизацией и регистрацией
+
+#### Статус: сделано :white_check_mark:
 
 <a href="https://anastasiapovarkova.github.io/react-mesto-auth" target="_blank">
     <img src="https://github.com/AnastasiaPovarkova/react-mesto-auth/blob/main/src/images/screensaverr.png?raw=true" width="900" title="Mesto React with Auth" alt="Mesto React with Auth"/>
